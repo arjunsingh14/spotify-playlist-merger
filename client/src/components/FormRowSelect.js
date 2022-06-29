@@ -1,21 +1,21 @@
 import React from "react";
 
-const FormRowSelect = ({ label, name, value, handleChange, list }) => {
+const FormRowSelect = ({ label, name, value, handleChange, list}) => {
   return (
-    <div className="form-row">
+    <div className="container-sm">
       <label htmlFor={name} className="form-label">
         {label || name}
       </label>
       <select
         name={name}
         value={value}
-        onChange={handleChange}
+        onChange={(e)=>handleChange(e)}
         className="form-select"
       >
         {list.map((itemValue, index) => {
           return (
-            <option key={index} value={itemValue}>
-              {itemValue}
+            <option key={index} value={itemValue.name}>
+              {itemValue.name}
             </option>
           );
         })}

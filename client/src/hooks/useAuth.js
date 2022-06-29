@@ -40,7 +40,7 @@ export default function useAuth(code) {
     const interval = setInterval(() => {
       refresh("http://localhost:3001/refresh", refreshToken);
 
-    }, ((expiresIn-60) * 1000))
+    }, ((expiresIn - 60) * 100000))
     return () => clearInterval(interval)
   }, [refreshToken, expiresIn]);
 
