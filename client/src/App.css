@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Signika&display=swap');
 
 body,
 html,
@@ -16,7 +16,31 @@ html,
 }
 
 .font-main {
-  font-family: "Lato", sans-serif;
+  font-family: 'Signika', sans-serif;
+}
+
+.form-label {
+    color: white;
+    font:1.5rem 'Signika', sans-serif;
+}
+
+.form-select {
+    background: transparent;
+    border-width: 2px;
+    color: white;
+    font-family: "Signika", sans-serif;
+}
+
+.btn-custom {
+    color: white;
+    background: transparent;
+    border: 2px solid white;
+     font-family: "Signika", sans-serif;
+}
+
+.btn:hover {
+    color: white;
+    background: rgba(29, 185, 84, 1)
 }
 
 

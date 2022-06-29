@@ -35,9 +35,9 @@ const Dashboard = ({ code }) => {
     const formattedTracksTwo = resTwo.body.items.map((curr) => {
         return `spotify:track:${curr.track.id}`
     })
-    formattedTracksOne.concat(formattedTracksTwo)
+    const mergedPlaylist = formattedTracksOne.concat(formattedTracksTwo)
     const data = await spotifyApi.createPlaylist('merged', {description: ""})
-    await spotifyApi.addTracksToPlaylist(data.body.id, formattedTracksOne);
+    await spotifyApi.addTracksToPlaylist(data.body.id, mergedPlaylist);
   }
 
   
@@ -73,8 +73,7 @@ const Dashboard = ({ code }) => {
       console.log("no token");
       return;
     }
-    getTracks()
-   
+    getTracks()  
   };
 
   if (isLoading) {
@@ -132,7 +131,11 @@ const Dashboard = ({ code }) => {
             handleChange={change}
           />
         </div>
-        <button className= "btn btn-success"onClick={handleClick}>Merge playlists</button>
+        <div className="text-center">
+          <button className="btn btn-custom btn-lg" onClick={handleClick}>
+            Merge playlists
+          </button>
+        </div>
       </div>
     );
   }

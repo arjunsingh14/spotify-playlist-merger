@@ -7,15 +7,15 @@ const Login = () => {
   return (
     <div className="container-fluid">
       <div className="p-5 pb-1">
-        <div>
-          <img className="img img-fluid" src={spotify} alt="spotify logo" />
+        <div className="text-center">
+          <img className="img img-fluid mb-4"  src={spotify} alt="spotify logo" />
           <p className="text-light fw-bolder font-main fs-1 text-center">
-            Playlist merger
+            Merge your playlists
           </p>
         </div>
       </div>
       <div className="text-center">
-        <a className="btn btn-success btn-lg" href={auth_url}>
+        <a className="btn btn-custom btn-lg" href={auth_url}>
           Login
         </a>
       </div>
