@@ -4,17 +4,16 @@ import SpotifyWebApi from "spotify-web-api-node";
 import FormRowSelect from "../components/FormRowSelect";
 import FormRow from "../components/FormRow";
 
-
 const Dashboard = ({ code }) => {
   const token = useAuth(code);
   const [search, setSearch] = useState({
     playlistOneId: "",
     playlistTwoId: "",
   });
-  const [playlistName, setPlaylistName] = useState("");
+  const [playlist, setPlaylist] = useState({name: "", description: ""});
   const [isLoading, setIsLoading] = useState(true);
   const [allPlaylists, setAllPlaylists] = useState([]);
-  const [newPlaylist, setNewPlaylist] = useState(false);
+  const [newPlaylist, setNewPlaylist] = useState(true);
 
   const spotifyApi = new SpotifyWebApi({
     clientId: process.env.CLIENT_ID,
@@ -49,20 +48,19 @@ const Dashboard = ({ code }) => {
         return `spotify:track:${curr.track.id}`;
       });
       const mergedPlaylist = formattedTracksOne.concat(formattedTracksTwo);
+      console.log(playlist.name)
       const data = await spotifyApi.createPlaylist(
-        playlistName || "merged playlist",
-        { description: "" }
+        playlist.name || "merged playlist",
+        { description: playlist.description }
       );
       await spotifyApi.addTracksToPlaylist(data.body.id, mergedPlaylist);
-      
+    } else {
+      await spotifyApi.addTracksToPlaylist(
+        search.playlistOneId,
+        formattedTracksTwo
+      );
     }
-    else {
-        await spotifyApi.addTracksToPlaylist(
-          search.playlistOneId,
-          formattedTracksTwo
-        );
-    }
-    setNewPlaylist(false)
+    setNewPlaylist(false);
   };
 
   useEffect(() => {
@@ -91,10 +89,11 @@ const Dashboard = ({ code }) => {
     setSearch({ ...search, [name]: key.id });
   };
 
-  const nameChange = (e) => {
+  const handleDetailsChange = (e) => {
     if (!token) return;
+    const name = e.target.name;
     const value = e.target.value;
-    setPlaylistName(value);
+    setPlaylist({...playlist, [name]: value});
   };
 
   //Generates a new playlist and id, and takes in an array of tracks from each individual playlist
@@ -104,7 +103,7 @@ const Dashboard = ({ code }) => {
       return;
     }
     createNewPlaylist();
-    setPlaylistName("");
+    setPlaylist({name: "", description: ""})
   };
 
   if (isLoading) {
@@ -140,13 +139,25 @@ const Dashboard = ({ code }) => {
           />
         </div>
         {newPlaylist && (
-          <div className="mb-3">
-            <FormRow
-              label="Playlist name"
-              name="playlistName"
-              type="text"
-              handleChange={nameChange}
-            />
+          <div className="container-fluid p-0 mb-3">
+            <div className="mb-3">
+              <FormRow
+                label="Playlist name"
+                name="name"
+                type="text"
+                handleChange={handleDetailsChange}
+              />
+            </div>
+            <div className="input-group container-sm">
+              <span className="input-group-text">Description</span>
+              <textarea
+                className="form-control"
+                aria-label="With textarea"
+                name="description"
+                value={playlist.description}
+                onChange={handleDetailsChange}
+              ></textarea>
+            </div>
           </div>
         )}
         <div className="container-sm form-check d-flex justify-content-center mb-3">
@@ -154,7 +165,7 @@ const Dashboard = ({ code }) => {
             className="form-check-input"
             type="checkbox"
             id="flexCheckDefault"
-            checked = {newPlaylist}
+            checked={newPlaylist}
             onChange={() => setNewPlaylist(!newPlaylist)}
           />
           <label className="form-check-label px-2" htmlFor="flexCheckDefault">
