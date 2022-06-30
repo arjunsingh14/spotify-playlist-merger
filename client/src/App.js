@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Footer from "./components/Footer";
 function App() {
   const code = new URLSearchParams(window.location.search).get('code');
+ 
   return <div className="d-flex flex-column min-vh-100">
     {code ? <Dashboard code={code}/> : <Login/>}
     <Footer/>

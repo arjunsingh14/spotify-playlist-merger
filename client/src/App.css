@@ -4,6 +4,7 @@ body,
 html,
 #root {
   height: 100%;
+  font-family: 'Signika', sans-serif;
   background: linear-gradient(
     135deg,
     rgba(29, 185, 84, 1) 0%,
@@ -15,13 +16,11 @@ html,
   
 }
 
-.font-main {
-  font-family: 'Signika', sans-serif;
-}
+
 
 .form-label {
     color: white;
-    font:1.5rem 'Signika', sans-serif;
+    font-size: 1.5rem;
 }
 
 .form-select {
@@ -30,17 +29,29 @@ html,
     color: white;
     font-family: "Signika", sans-serif;
 }
+.form-input {
+    color: white;
+    width: 100%;
+    font-size: 1.3rem;
+    background: transparent;
+    border: 2px solid #ced4da;
+    border-radius: 0.25rem;
+}
 
 .btn-custom {
     color: white;
     background: transparent;
     border: 2px solid white;
-     font-family: "Signika", sans-serif;
+    font-family: "Signika", sans-serif;
 }
 
 .btn:hover {
     color: white;
     background: rgba(29, 185, 84, 1)
+}
+
+.form-check-label {
+    color: white;
 }
 
 

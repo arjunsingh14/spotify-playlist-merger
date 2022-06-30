@@ -2,11 +2,19 @@ import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import SpotifyWebApi from "spotify-web-api-node";
 import FormRowSelect from "../components/FormRowSelect";
+import FormRow from "../components/FormRow";
+
+
 const Dashboard = ({ code }) => {
   const token = useAuth(code);
-  const [search, setSearch] = useState({playlistOneId: "", playlistTwoId: "" });
+  const [search, setSearch] = useState({
+    playlistOneId: "",
+    playlistTwoId: "",
+  });
+  const [playlistName, setPlaylistName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [allPlaylists, setAllPlaylists] = useState([]);
+  const [newPlaylist, setNewPlaylist] = useState(false);
 
   const spotifyApi = new SpotifyWebApi({
     clientId: process.env.CLIENT_ID,
@@ -26,21 +34,36 @@ const Dashboard = ({ code }) => {
 
   //   }
 
-  const getTracks = async () => {
-    const resOne = await spotifyApi.getPlaylistTracks(search.playlistOneId);
-    const resTwo = await spotifyApi.getPlaylistTracks(search.playlistTwoId);
-    const formattedTracksOne = resOne.body.items.map((curr) => {
-        return `spotify:track:${curr.track.id}`
-    })
+  const createNewPlaylist = async () => {
+    const resTwo = await spotifyApi.getPlaylistTracks(search.playlistTwoId, {
+      limit: 50,
+    });
     const formattedTracksTwo = resTwo.body.items.map((curr) => {
-        return `spotify:track:${curr.track.id}`
-    })
-    const mergedPlaylist = formattedTracksOne.concat(formattedTracksTwo)
-    const data = await spotifyApi.createPlaylist('merged', {description: ""})
-    await spotifyApi.addTracksToPlaylist(data.body.id, mergedPlaylist);
-  }
-
-  
+      return `spotify:track:${curr.track.id}`;
+    });
+    if (newPlaylist) {
+      const resOne = await spotifyApi.getPlaylistTracks(search.playlistOneId, {
+        limit: 50,
+      });
+      const formattedTracksOne = resOne.body.items.map((curr) => {
+        return `spotify:track:${curr.track.id}`;
+      });
+      const mergedPlaylist = formattedTracksOne.concat(formattedTracksTwo);
+      const data = await spotifyApi.createPlaylist(
+        playlistName || "merged playlist",
+        { description: "" }
+      );
+      await spotifyApi.addTracksToPlaylist(data.body.id, mergedPlaylist);
+      
+    }
+    else {
+        await spotifyApi.addTracksToPlaylist(
+          search.playlistOneId,
+          formattedTracksTwo
+        );
+    }
+    setNewPlaylist(false)
+  };
 
   useEffect(() => {
     if (!token) return;
@@ -48,88 +71,95 @@ const Dashboard = ({ code }) => {
     spotifyApi.getMe().then((res) => {
       const user = res.body.id;
       spotifyApi.getUserPlaylists(user).then((res) => {
-        console.log(res.body.items)
+        console.log(res.body.items);
         setAllPlaylists(res.body.items);
-        setSearch({...search, playlistOneId: res.body.items[0].id, playlistTwoId: res.body.items[0].id})
+        setSearch({
+          ...search,
+          playlistOneId: res.body.items[0].id,
+          playlistTwoId: res.body.items[0].id,
+        });
       });
     });
-    setIsLoading(false)
-  }, [token]);
+    setIsLoading(false);
+  }, [token, newPlaylist]);
 
-  const change = (e) => {
+  const playlistChange = (e) => {
     if (!token) return;
     const name = e.target.name;
     const value = e.target.value;
-    const key = allPlaylists.find((item)=>item.name===value)
-    setSearch({ ...search, [name+"Id"]: key.id });
+    const key = allPlaylists.find((item) => item.name === value);
+    setSearch({ ...search, [name]: key.id });
   };
 
+  const nameChange = (e) => {
+    if (!token) return;
+    const value = e.target.value;
+    setPlaylistName(value);
+  };
 
-  
   //Generates a new playlist and id, and takes in an array of tracks from each individual playlist
   const handleClick = () => {
-    console.log(search)
     if (!token) {
       console.log("no token");
       return;
     }
-    getTracks()  
+    createNewPlaylist();
+    setPlaylistName("");
   };
 
   if (isLoading) {
     return (
-      <div class="d-flex justify-content-center pt-5">
+      <div className="d-flex justify-content-center pt-5">
         <div
-          class="spinner-border"
-          style={{width: "10rem", height: "10rem"}}
+          className="spinner-border primary-success"
+          style={{ width: "10rem", height: "10rem" }}
           role="status"
         >
-          <span class="sr-only"></span>
+          <span className="sr-only"></span>
         </div>
       </div>
     );
   } else {
     return (
       <div className="m-5 p-5">
-        <div className="mb-5">
-          {/* <label htmlFor="playlistOne" className="form-label">
-          Playlist 1
-        </label>
-        <input
-          type="text"
-          value={search.playlistOne}
-          name="playlistOne"
-          className="form-control"
-          id="playlistOne"
-          placeholder="Lofi beats"
-          onChange={handleChange}
-        /> */}
+        <div className="mb-3">
           <FormRowSelect
-            name="playlistOne"
+            name="playlistOneId"
             label="First playlist"
             placeholder="Lofi beats"
             list={allPlaylists}
-            handleChange={change}
+            handleChange={playlistChange}
           />
         </div>
         <div className="mb-3">
-          {/* <label htmlFor="playlist2" className="form-label">
-          Playlist 2
-        </label>
-        <input
-          type="text"
-          value={search.playlistTwo}
-          className="form-control"
-          name="playlistTwo"
-          id="playlistTwo"
-          placeholder="trap bangers"
-          onChange={handleChange} */}
           <FormRowSelect
             label="Second playlist"
-            name="playlistTwo"
+            name="playlistTwoId"
             list={allPlaylists}
-            handleChange={change}
+            handleChange={playlistChange}
           />
+        </div>
+        {newPlaylist && (
+          <div className="mb-3">
+            <FormRow
+              label="Playlist name"
+              name="playlistName"
+              type="text"
+              handleChange={nameChange}
+            />
+          </div>
+        )}
+        <div className="container-sm form-check d-flex justify-content-center mb-3">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            id="flexCheckDefault"
+            checked = {newPlaylist}
+            onChange={() => setNewPlaylist(!newPlaylist)}
+          />
+          <label className="form-check-label px-2" htmlFor="flexCheckDefault">
+            Create new playlist
+          </label>
         </div>
         <div className="text-center">
           <button className="btn btn-custom btn-lg" onClick={handleClick}>
