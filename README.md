@@ -26,6 +26,12 @@ npm run devStart
 npm start
 ```
 
-# Visuals
-Login screen
-![Alt text](/spotify-playlist-merger/client/images/login.png "Optional Title")
+## Visuals
+
+### Login screen
+
+![Alt text](/images/login.png "login screen")
+
+### Merge your playlists
+
+![Alt text](/images/create.png "merge your playlists")
