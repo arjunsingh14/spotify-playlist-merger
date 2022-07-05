@@ -1,28 +1,43 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 export default function useAuth(code) {
-  const [accessToken, setAccessToken] = useState();
+  const [accessToken, setAccessToken] = useState(localStorage.getItem("token"));
   const [refreshToken, setRefreshToken] = useState();
   const [expiresIn, setExpiresIn] = useState();
 
+  /**
+   * Triggers an axios request to the login route
+   * which responds with an accessToken, expiresIn and
+   * the refreshToken which are stored in state. The accessToken is also saved in
+   * localStorage to prevent constant login prompts.
+   *
+   * @param {String} url
+   * @param {Object} reqContent
+   */
   const getToken = async (url, reqContent) => {
     try {
       const res = await axios.post(url, { reqContent });
-      console.log(res)
       window.history.pushState({}, null, "/");
+      localStorage.setItem("token", res.data.accessToken);
       setAccessToken(res.data.accessToken);
       setExpiresIn(res.data.expiresIn);
       setRefreshToken(res.data.refreshToken);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
-
+  /**
+   * Triggers axios to "/refresh" request to server.js
+   * one minute before the accessToken expires which responds with
+   * a refreshed token
+   * @param {String} url
+   * @param {Object} reqContent
+   */
   const refresh = async (url, reqContent) => {
     try {
       const res = await axios.post(url, { reqContent });
-      window.history.pushState({}, null, "/");
       setAccessToken(res.data.accessToken);
+      localStorage.setItem("token", res.data.accessToken);
       setExpiresIn(res.data.expiresIn);
     } catch (error) {
       console.log(error);
@@ -30,18 +45,19 @@ export default function useAuth(code) {
   };
 
   useEffect(() => {
-    getToken("http://localhost:3001/login", code);
+    if (!accessToken) {
+      getToken("http://localhost:3001/login", code);
+    }
   }, [code]);
 
   useEffect(() => {
     if (!refreshToken || !expiresIn) {
-      return
+      return;
     }
     const interval = setInterval(() => {
       refresh("http://localhost:3001/refresh", refreshToken);
-
-    }, ((expiresIn - 60) * 100000))
-    return () => clearInterval(interval)
+    }, (expiresIn - 60) * 100000);
+    return () => clearInterval(interval);
   }, [refreshToken, expiresIn]);
 
   return accessToken;

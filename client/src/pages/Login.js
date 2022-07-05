@@ -1,6 +1,6 @@
 import React from "react";
 import spotify from "../assets/spotify.svg";
-const client_id = process.env.REACT_APP_CLIENT_ID;
+const client_id = "3a43d5933a8d45e9bb2387ae7c86a4bb";
 const redirectUri = "http://localhost:3000/";
 const auth_url = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${redirectUri}&scope=user-read-email%20user-read-private%20playlist-read-private%20playlist-modify-public%20playlist-modify-private`;
 const Login = () => {
