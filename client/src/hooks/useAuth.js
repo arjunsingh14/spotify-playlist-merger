@@ -46,7 +46,7 @@ export default function useAuth(code) {
 
   useEffect(() => {
     if (!accessToken) {
-      getToken("http://localhost:3001/login", code);
+      getToken("http://localhost:8080/login", code);
     }
   }, [code]);
 
@@ -55,7 +55,7 @@ export default function useAuth(code) {
       return;
     }
     const interval = setInterval(() => {
-      refresh("http://localhost:3001/refresh", refreshToken);
+      refresh("http://localhost:8080/refresh", refreshToken);
     }, (expiresIn - 60) * 100000);
     return () => clearInterval(interval);
   }, [refreshToken, expiresIn]);
