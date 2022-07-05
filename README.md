@@ -27,3 +27,5 @@ npm start
 ```
 
 # Visuals
+Login screen
+![Alt text](/spotify-playlist-merger/client/images/login.png "Optional Title")
